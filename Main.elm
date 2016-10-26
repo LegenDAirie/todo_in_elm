@@ -7,7 +7,9 @@ import Html.App as App
 import Material
 import Material.Scheme
 import Material.Button as Button
+import Material.List as Lists
 import Material.Options exposing (css)
+import Material.Options as Options
 import Material.Layout as Layout
 import Material.Color as Color
 
@@ -164,13 +166,15 @@ pending model =
 displayTodos : Model -> List Todo -> Html Msg
 displayTodos model todos =
     div []
-        [ ul
+        [ Lists.ul
             []
             (List.map
                 (\todo ->
-                    li
-                        [ onClick (ToggleCompleted todo), style [ liStyle todo.completed ] ]
-                        [ text todo.text ]
+                    Lists.li []
+                        [ Lists.content
+                            [ Options.attribute <| onClick (ToggleCompleted todo), liStyle todo.completed ]
+                            [ text todo.text ]
+                        ]
                 )
                 todos
             )
@@ -186,9 +190,9 @@ displayTodos model todos =
         ]
 
 
-liStyle : Bool -> ( String, String )
+liStyle : Bool -> Material.Options.Property c m
 liStyle completed =
     if completed then
-        ( "text-decoration", "line-through" )
+        css "text-decoration" "line-through"
     else
-        ( "", "" )
+        css "" ""
