@@ -9,6 +9,7 @@ import Material.Scheme
 import Material.Button as Button
 import Material.Options exposing (css)
 import Material.Layout as Layout
+import Material.Color as Color
 
 
 main =
@@ -130,28 +131,28 @@ view model =
 
 viewBody : Model -> Html Msg
 viewBody model =
-    div []
-        [ ul
-            []
-            (List.map
-                (\todo ->
-                    li
-                        [ onClick (ToggleCompleted todo), style [ liStyle todo.completed ] ]
-                        [ text todo.text ]
+    Material.Scheme.topWithScheme Color.Teal Color.LightGreen <|
+        div []
+            [ ul
+                []
+                (List.map
+                    (\todo ->
+                        li
+                            [ onClick (ToggleCompleted todo), style [ liStyle todo.completed ] ]
+                            [ text todo.text ]
+                    )
+                    model.todos
                 )
-                model.todos
-            )
-        , input [ onInput ChangeField ] []
-        , Button.render Mdl
-            [ 0 ]
-            model.mdl
-            [ Button.onClick Add
-            , css "margin" "0 24px"
+            , input [ onInput ChangeField ] []
+            , Button.render Mdl
+                [ 0 ]
+                model.mdl
+                [ Button.onClick Add
+                , css "margin" "0 24px"
+                ]
+                [ text "Add Todo Item" ]
+              -- , button [ onClick Add ] [ text "Add Todo Item" ]
             ]
-            [ text "Add Todo Item" ]
-          -- , button [ onClick Add ] [ text "Add Todo Item" ]
-        ]
-        |> Material.Scheme.top
 
 
 
