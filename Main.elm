@@ -64,29 +64,6 @@ update msg model =
             }
 
 
-
--- ToggleCompleted todo ->
---     { model
---         | todos =
---             let
---                 todo =
---                     List.head <| List.filter (\todo -> todo.id == id) model.todos
---
---                 rest =
---                     List.filter (\todo -> todo.id /= id) model.todos
---             in
---                 case todo of
---                     Just todo ->
---                         { todo
---                             | completed = not todo.completed
---                         }
---                             :: rest
---
---                     Nothing ->
---                         model.todos
---     }
-
-
 toggleTodo : Todo -> Todo -> Todo
 toggleTodo todo todo' =
     if todo == todo' then
