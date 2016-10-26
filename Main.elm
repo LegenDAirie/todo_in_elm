@@ -7,10 +7,11 @@ import Html.App as App
 
 
 main =
-    App.beginnerProgram
-        { model = model
+    App.program
+        { init = init
         , update = update
         , view = view
+        , subscriptions = (\_ -> Sub.none)
         }
 
 
@@ -28,13 +29,15 @@ type alias Model =
     }
 
 
-model : Model
-model =
-    { todos = []
-    , todoFilter =
-        "All"
-    , textField = ""
-    }
+init : ( Model, Cmd Msg )
+init =
+    ( { todos = []
+      , todoFilter =
+            "All"
+      , textField = ""
+      }
+    , Cmd.none
+    )
 
 
 type Msg
@@ -43,25 +46,31 @@ type Msg
     | ToggleCompleted Todo
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case (Debug.log "msg" msg) of
         ChangeField newText ->
-            { model
+            ( { model
                 | textField = newText
-            }
+              }
+            , Cmd.none
+            )
 
         Add ->
-            { model
+            ( { model
                 | todos =
                     Todo model.textField (getId model.todos) False
                         :: model.todos
-            }
+              }
+            , Cmd.none
+            )
 
         ToggleCompleted todo ->
-            { model
+            ( { model
                 | todos = List.map (\todo' -> (toggleTodo todo todo')) model.todos
-            }
+              }
+            , Cmd.none
+            )
 
 
 toggleTodo : Todo -> Todo -> Todo
@@ -71,7 +80,7 @@ toggleTodo todo todo' =
             | completed = not todo.completed
         }
     else
-        todo
+        todo'
 
 
 getId : List Todo -> Int
