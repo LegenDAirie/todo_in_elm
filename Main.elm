@@ -30,7 +30,7 @@ type alias Todo =
 
 type alias Model =
     { todos : List Todo
-    , todoFilter : String
+    , selectedTab : Int
     , textField : String
     , mdl : Material.Model
     }
@@ -39,7 +39,7 @@ type alias Model =
 init : ( Model, Cmd Msg )
 init =
     ( { todos = []
-      , todoFilter = "All"
+      , selectedTab = 0
       , textField = ""
       , mdl = Material.model
       }
@@ -52,6 +52,7 @@ type Msg
     | ChangeField String
     | ToggleCompleted Todo
     | Mdl (Material.Msg Msg)
+    | SelectTab Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -83,6 +84,9 @@ update msg model =
         -- When the `Mdl` messages come through, update appropriately.
         Mdl msg' ->
             Material.update msg' model
+
+        SelectTab num ->
+            { model | selectedTab = num } ! []
 
 
 toggleTodo : Todo -> Todo -> Todo
@@ -118,45 +122,68 @@ type alias Mdl =
 
 view : Model -> Html Msg
 view model =
-    Layout.render Mdl
-        model.mdl
-        [ Layout.fixedHeader
-        ]
-        { header = [ h1 [ style [ ( "padding", "2rem" ) ] ] [ text "Todos" ] ]
-        , drawer = []
-        , tabs = ( [ text "All", text "Pending", text "Completed" ], [] )
-        , main = [ viewBody model ]
-        }
+    Material.Scheme.topWithScheme Color.Teal Color.LightGreen <|
+        Layout.render Mdl
+            model.mdl
+            [ Layout.fixedHeader
+            , Layout.onSelectTab SelectTab
+            ]
+            { header = [ h1 [ style [ ( "padding", "2rem" ) ] ] [ text "Todos" ] ]
+            , drawer = []
+            , tabs = ( [ text "All", text "Pending", text "Completed" ], [] )
+            , main = [ viewBody model ]
+            }
 
 
 viewBody : Model -> Html Msg
 viewBody model =
-    Material.Scheme.topWithScheme Color.Teal Color.LightGreen <|
-        div []
-            [ ul
-                []
-                (List.map
-                    (\todo ->
-                        li
-                            [ onClick (ToggleCompleted todo), style [ liStyle todo.completed ] ]
-                            [ text todo.text ]
-                    )
-                    model.todos
+    case model.selectedTab of
+        0 ->
+            displayTodos model model.todos
+
+        1 ->
+            pending model
+
+        2 ->
+            completed model
+
+        _ ->
+            text "404"
+
+
+completed : Model -> Html Msg
+completed model =
+    displayTodos model (List.filter (\todo -> todo.completed == True) model.todos)
+
+
+pending : Model -> Html Msg
+pending model =
+    displayTodos model (List.filter (\todo -> todo.completed == False) model.todos)
+
+
+displayTodos : Model -> List Todo -> Html Msg
+displayTodos model todos =
+    div []
+        [ ul
+            []
+            (List.map
+                (\todo ->
+                    li
+                        [ onClick (ToggleCompleted todo), style [ liStyle todo.completed ] ]
+                        [ text todo.text ]
                 )
-            , input [ onInput ChangeField ] []
-            , Button.render Mdl
-                [ 0 ]
-                model.mdl
-                [ Button.onClick Add
-                , css "margin" "0 24px"
-                ]
-                [ text "Add Todo Item" ]
-              -- , button [ onClick Add ] [ text "Add Todo Item" ]
+                todos
+            )
+        , input [ onInput ChangeField ] []
+        , Button.render Mdl
+            [ 0 ]
+            model.mdl
+            [ Button.onClick Add
+            , css "margin" "0 24px"
             ]
-
-
-
--- |> Material.Scheme.top
+            [ text "Add Todo Item" ]
+          -- , button [ onClick Add ] [ text "Add Todo Item" ]
+        ]
 
 
 liStyle : Bool -> ( String, String )
