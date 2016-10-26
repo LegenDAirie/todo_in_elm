@@ -1,9 +1,14 @@
 module Main exposing (..)
 
-import Html exposing (Html, text, ul, li, div, button, input)
+import Html exposing (Html, text, ul, li, div, button, input, h1)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick, onInput)
 import Html.App as App
+import Material
+import Material.Scheme
+import Material.Button as Button
+import Material.Options exposing (css)
+import Material.Layout as Layout
 
 
 main =
@@ -26,15 +31,16 @@ type alias Model =
     { todos : List Todo
     , todoFilter : String
     , textField : String
+    , mdl : Material.Model
     }
 
 
 init : ( Model, Cmd Msg )
 init =
     ( { todos = []
-      , todoFilter =
-            "All"
+      , todoFilter = "All"
       , textField = ""
+      , mdl = Material.model
       }
     , Cmd.none
     )
@@ -44,6 +50,7 @@ type Msg
     = Add
     | ChangeField String
     | ToggleCompleted Todo
+    | Mdl (Material.Msg Msg)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -71,6 +78,10 @@ update msg model =
               }
             , Cmd.none
             )
+
+        -- When the `Mdl` messages come through, update appropriately.
+        Mdl msg' ->
+            Material.update msg' model
 
 
 toggleTodo : Todo -> Todo -> Todo
@@ -100,8 +111,25 @@ getId todos =
         id + 1
 
 
+type alias Mdl =
+    Material.Model
+
+
 view : Model -> Html Msg
 view model =
+    Layout.render Mdl
+        model.mdl
+        [ Layout.fixedHeader
+        ]
+        { header = [ h1 [ style [ ( "padding", "2rem" ) ] ] [ text "Todos" ] ]
+        , drawer = []
+        , tabs = ( [ text "All", text "Pending", text "Completed" ], [] )
+        , main = [ viewBody model ]
+        }
+
+
+viewBody : Model -> Html Msg
+viewBody model =
     div []
         [ ul
             []
@@ -114,8 +142,20 @@ view model =
                 model.todos
             )
         , input [ onInput ChangeField ] []
-        , button [ onClick Add ] [ text "Add Todo Item" ]
+        , Button.render Mdl
+            [ 0 ]
+            model.mdl
+            [ Button.onClick Add
+            , css "margin" "0 24px"
+            ]
+            [ text "Add Todo Item" ]
+          -- , button [ onClick Add ] [ text "Add Todo Item" ]
         ]
+        |> Material.Scheme.top
+
+
+
+-- |> Material.Scheme.top
 
 
 liStyle : Bool -> ( String, String )
