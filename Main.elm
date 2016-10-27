@@ -168,37 +168,45 @@ pending model =
 
 displayTodos : Model -> List Todo -> Html Msg
 displayTodos model todos =
-    Options.div []
-        [ Lists.ul
-            []
-            (List.map
-                (\todo ->
-                    Lists.li []
-                        [ Lists.content
-                            [ Options.attribute <| onClick (ToggleCompleted todo)
-                            , liStyle todo.completed
+    Options.div
+        [ Options.center
+        , css "align-self" "flex-end"
+        , css "height" "100vh"
+        ]
+        [ Options.div []
+            [ Lists.ul
+                []
+                (List.map
+                    (\todo ->
+                        Lists.li []
+                            [ Lists.content
+                                [ Options.attribute <| onClick (ToggleCompleted todo)
+                                , liStyle todo.completed
+                                ]
+                                [ text todo.text ]
                             ]
-                            [ text todo.text ]
-                        ]
+                    )
+                    todos
                 )
-                todos
-            )
-        , Options.div
-            [ Options.center ]
-            [ Textfield.render Mdl
-                [ 0 ]
-                model.mdl
-                [ Textfield.onInput ChangeField ]
-            , Button.render Mdl
-                [ 0 ]
-                model.mdl
-                [ Button.fab
-                , Button.colored
-                , Button.onClick
-                    Add
-                , css "margin" "0 24px"
+            , Options.div
+                []
+                [ Textfield.render Mdl
+                    [ 0 ]
+                    model.mdl
+                    [ Textfield.floatingLabel
+                    , Textfield.onInput ChangeField
+                    ]
+                , Button.render Mdl
+                    [ 0 ]
+                    model.mdl
+                    [ Button.fab
+                    , Button.colored
+                    , Button.onClick
+                        Add
+                    , css "margin" "0 24px"
+                    ]
+                    [ Icon.i "add" ]
                 ]
-                [ Icon.i "add" ]
             ]
         ]
 
