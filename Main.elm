@@ -169,27 +169,30 @@ pending model =
 displayTodos : Model -> List Todo -> Html Msg
 displayTodos model todos =
     Options.div
-        [ Options.center
-        , css "align-self" "flex-end"
-        , css "height" "100vh"
-        ]
-        [ Options.div []
-            [ Lists.ul
-                []
-                (List.map
-                    (\todo ->
-                        Lists.li []
-                            [ Lists.content
-                                [ Options.attribute <| onClick (ToggleCompleted todo)
-                                , liStyle todo.completed
-                                ]
-                                [ text todo.text ]
+        [ Options.center ]
+        [ Lists.ul
+            []
+            (List.map
+                (\todo ->
+                    Lists.li []
+                        [ Lists.content
+                            [ Options.attribute <| onClick (ToggleCompleted todo)
+                            , liStyle todo.completed
                             ]
-                    )
-                    todos
+                            [ text todo.text ]
+                        ]
                 )
-            , Options.div
-                []
+                todos
+            )
+        , Options.div
+            [ css "position" "fixed"
+            , css "width" "100%"
+            , css "bottom" "0"
+            ]
+            [ Options.div
+                [ css "width" "max-content"
+                , css "margin" "auto"
+                ]
                 [ Textfield.render Mdl
                     [ 0 ]
                     model.mdl
