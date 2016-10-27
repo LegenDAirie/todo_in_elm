@@ -7,11 +7,14 @@ import Html.App as App
 import Material
 import Material.Scheme
 import Material.Button as Button
+import Material.Options as Options
+import Material.Textfield as Textfield
 import Material.List as Lists
 import Material.Options exposing (css)
-import Material.Options as Options
 import Material.Layout as Layout
 import Material.Color as Color
+import Material.Footer as Footer
+import Material.Icon as Icon
 
 
 main =
@@ -124,7 +127,7 @@ type alias Mdl =
 
 view : Model -> Html Msg
 view model =
-    Material.Scheme.topWithScheme Color.Teal Color.LightGreen <|
+    Material.Scheme.topWithScheme Color.Teal Color.Grey <|
         Layout.render Mdl
             model.mdl
             [ Layout.fixedHeader
@@ -165,28 +168,38 @@ pending model =
 
 displayTodos : Model -> List Todo -> Html Msg
 displayTodos model todos =
-    div []
+    Options.div []
         [ Lists.ul
             []
             (List.map
                 (\todo ->
                     Lists.li []
                         [ Lists.content
-                            [ Options.attribute <| onClick (ToggleCompleted todo), liStyle todo.completed ]
+                            [ Options.attribute <| onClick (ToggleCompleted todo)
+                            , liStyle todo.completed
+                            ]
                             [ text todo.text ]
                         ]
                 )
                 todos
             )
-        , input [ onInput ChangeField ] []
-        , Button.render Mdl
-            [ 0 ]
-            model.mdl
-            [ Button.onClick Add
-            , css "margin" "0 24px"
+        , Options.div
+            [ Options.center ]
+            [ Textfield.render Mdl
+                [ 0 ]
+                model.mdl
+                [ Textfield.onInput ChangeField ]
+            , Button.render Mdl
+                [ 0 ]
+                model.mdl
+                [ Button.fab
+                , Button.colored
+                , Button.onClick
+                    Add
+                , css "margin" "0 24px"
+                ]
+                [ Icon.i "add" ]
             ]
-            [ text "Add Todo Item" ]
-          -- , button [ onClick Add ] [ text "Add Todo Item" ]
         ]
 
 
